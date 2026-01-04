@@ -3,14 +3,16 @@ import { ref } from 'vue';
 import { useWindowManager } from '../../composables/useWindowManager';
 import { useSystemLogs } from '../../composables/useSystemLogs';
 import { useLanguage } from '../../composables/useLanguage';
+import { useAudioSystem } from '../../composables/useAudioSystem';
 import PortfolioView from '../../views/PortfolioView.vue';
 import ContactView from '../../views/ContactView.vue';
 import LangSwitch from '../UI/LangSwitch.vue';
 
 const isOpen = ref(false);
-const { openWindow, closeAllWindows } = useWindowManager(); // Assuming closeAllWindows or I might need to implement it roughly
+const { openWindow } = useWindowManager();
 const { addLog } = useSystemLogs();
 const { t } = useLanguage();
+const { isMuted, toggleMute, metadata } = useAudioSystem();
 
 const toggleMenu = () => {
   isOpen.value = !isOpen.value;
@@ -18,10 +20,6 @@ const toggleMenu = () => {
 };
 
 const handleBio = () => {
-  // Biography is the base view. We essentially just close any overlay windows to "reveal" it.
-  // Or if the user architecture changed, we might need to emit 'change-view'.
-  // For now, assuming AboutView is the base and windows are overlays:
-  // (Wait, useWindowManager logic might not expose 'closeAll'. I'll check.)
   isOpen.value = false;
 };
 
@@ -67,6 +65,21 @@ const handleContact = () => {
 
           <div class="nav-divider"></div>
 
+          <!-- Mobile Audio Player -->
+          <div class="mobile-audio-player">
+             <div class="player-info">
+               <span class="p-label">AUDIO FEED:</span>
+               <span class="p-track">{{ metadata.artist }}</span>
+               <span class="p-song">{{ metadata.song }}</span>
+             </div>
+             <button class="player-btn" @click="toggleMute" :class="{ muted: isMuted }">
+                <svg v-if="!isMuted" viewBox="0 0 24 24"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
+                <svg v-else viewBox="0 0 24 24"><path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" /></svg>
+             </button>
+          </div>
+
+          <div class="nav-divider"></div>
+
           <!-- Socials (Replica of AboutView sidebars) -->
           <div class="social-links">
              <a href="https://www.linkedin.com/in/joel-fereira-179298161/" target="_blank" class="social-btn">
@@ -95,7 +108,7 @@ const handleContact = () => {
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px), (max-height: 600px) {
   .mobile-nav-wrapper {
     display: block;
     /* Removed absolute position to let it flow in header */
@@ -236,4 +249,43 @@ const handleContact = () => {
   opacity: 0;
   transform: translateY(-20px);
 }
+
+.mobile-audio-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 15px;
+  background: rgba(0, 243, 255, 0.05);
+  border: 1px solid var(--neon-blue);
+  border-radius: 4px;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.p-label { color: var(--neon-purple); font-size: 0.6rem; letter-spacing: 1px; font-weight: bold; }
+.p-track { color: #fff; font-family: var(--font-code); font-size: 0.8em; }
+.p-song { color: var(--neon-cyan); font-family: var(--font-code); font-size: 0.75rem; }
+
+.player-btn {
+  background: transparent;
+  border: 1px solid var(--neon-blue);
+  color: var(--neon-blue);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.player-btn.muted { opacity: 0.5; border-color: #555; color: #aaa; }
+.player-btn:hover { background: var(--neon-blue); color: #000; opacity: 1; }
+.player-btn svg { width: 100%; height: 100%; }
 </style>

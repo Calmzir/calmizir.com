@@ -221,9 +221,23 @@ const deleteProject = async (id) => {
   }
 };
 
-// Hidden input refs for manual triggering
 const thumbInput = ref(null);
 const galleryInput = ref(null);
+
+// Actions Dropdown Logic
+const activeDropdownId = ref(null);
+const toggleDropdown = (id) => {
+  activeDropdownId.value = activeDropdownId.value === id ? null : id;
+};
+// Close dropdown when clicking elsewhere (basic)
+onMounted(() => {
+    document.addEventListener('click', (e) => {
+        // If click is not on a dots-btn, close
+        if (!e.target.closest('.dots-btn')) {
+            activeDropdownId.value = null;
+        }
+    });
+});
 </script>
 
 <template>
@@ -249,9 +263,31 @@ const galleryInput = ref(null);
             <td>{{ p.id }}</td>
             <td>{{ p.title }}</td>
             <td>{{ p.date }}</td>
-            <td class="actions">
-              <button @click="openEdit(p)" class="action-btn edit">EDIT</button>
-              <button @click="deleteProject(p.id)" class="action-btn delete">DEL</button>
+            <td class="actions-cell">
+              <!-- Desktop: Icons Side-by-Side -->
+              <div class="desktop-actions">
+                <button @click="openEdit(p)" class="icon-btn edit" title="Edit">
+                  <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
+                </button>
+                <button @click="deleteProject(p.id)" class="icon-btn delete" title="Delete">
+                  <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
+                </button>
+              </div>
+
+              <!-- Mobile: Dropdown -->
+              <div class="mobile-actions">
+                <button class="dots-btn" @click.stop="toggleDropdown(p.id)">
+                  <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z" /></svg>
+                </button>
+                <div v-if="activeDropdownId === p.id" class="action-dropdown">
+                  <button @click="openEdit(p); activeDropdownId = null">
+                    <span class="icon">✏️</span> EDIT
+                  </button>
+                  <button @click="deleteProject(p.id); activeDropdownId = null" class="danger">
+                    <span class="icon">🗑️</span> DELETE
+                  </button>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -680,5 +716,98 @@ input:focus, textarea:focus {
 .translate-btn:hover {
   background: var(--neon-cyan);
   color: #000;
+}
+
+/* --- ACTION BUTTONS (ICONS & DROPDOWN) --- */
+.desktop-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn svg { width: 100%; height: 100%; }
+
+.icon-btn.edit:hover { color: var(--neon-blue); border-color: var(--neon-blue); box-shadow: 0 0 5px var(--neon-blue); }
+.icon-btn.delete:hover { color: #f00; border-color: #f00; box-shadow: 0 0 5px #f00; }
+
+.mobile-actions {
+  display: none; /* Hidden on Desktop */
+  position: relative;
+}
+
+.dots-btn {
+  background: transparent;
+  border: none;
+  color: var(--neon-blue);
+  cursor: pointer;
+  padding: 5px;
+}
+.dots-btn svg { width: 24px; height: 24px; }
+
+.action-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%; /* Below button */
+  background: #0a0f18; /* Solid dark background */
+  border: 1px solid var(--neon-blue);
+  box-shadow: 0 0 15px rgba(0,0,0,0.8);
+  z-index: 9999; /* High Z-Index as requested */
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.action-dropdown button {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 12px 15px;
+  text-align: left;
+  font-family: var(--font-code);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.action-dropdown button:hover {
+  background: rgba(0, 243, 255, 0.1);
+}
+
+.action-dropdown button.danger {
+  color: #ff4444;
+}
+.action-dropdown button.danger:hover {
+  background: rgba(255, 0, 0, 0.1);
+}
+.action-dropdown button:last-child {
+  border-bottom: none;
+}
+
+.action-dropdown .icon { font-size: 1.1rem; }
+
+@media (max-width: 768px) {
+  .desktop-actions { display: none; }
+  .mobile-actions { display: block; margin-left: auto; }
+  .actions-cell { width: 50px; text-align: center; }
 }
 </style>

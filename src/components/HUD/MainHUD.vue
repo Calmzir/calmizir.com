@@ -1,12 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import MobileNav from './MobileNav.vue'; // Import
+import MobileNav from './MobileNav.vue';
+import { useAudioSystem } from '../../composables/useAudioSystem'; // Import
 
 defineProps({
   currentView: String
 })
 
 defineEmits(['change-view'])
+
+const { isMuted, initAudio, toggleMute, metadata } = useAudioSystem(); // Init Composable
 
 const hudData = ref({
   date: '',
@@ -33,6 +36,11 @@ const updateTime = () => {
 onMounted(() => {
   updateTime();
   timer = setInterval(updateTime, 1000);
+  
+  // Init Audio (will try autoplay)
+  // Defer slightly to ensure user interaction capability if possible, though mounted is auto.
+  // We'll rely on the user clicking the Mute button if autoplay fails/mutes.
+  initAudio();
 });
 
 onUnmounted(() => {
@@ -44,8 +52,27 @@ onUnmounted(() => {
   <div class="hud-container">
     <!-- Top Bar Status -->
     <header class="hud-header">
-      <div class="system-status">
-        <span class="status-dot"></span> SYSTEM ONLINE
+      <div class="header-left-group">
+        <div class="system-status">
+          <span class="status-dot"></span> SYSTEM ONLINE
+        </div>
+
+        <!-- Desktop Audio Player -->
+        <div class="audio-player-desktop">
+           <button 
+             class="audio-btn" 
+             @click="toggleMute" 
+             :title="isMuted ? 'UNMUTE AUDIO' : 'MUTE AUDIO'"
+           >
+             <!-- Icon Speaker On/Off -->
+             <svg v-if="!isMuted" viewBox="0 0 24 24"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
+             <svg v-else viewBox="0 0 24 24"><path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" /></svg>
+           </button>
+           <div class="audio-info">
+             <span class="music-label">NOW PLAYING:</span>
+             <span class="track-name">{{ metadata.artist }} - {{ metadata.song }}</span>
+           </div>
+        </div>
       </div>
       
       <div class="header-controls">
@@ -115,12 +142,50 @@ onUnmounted(() => {
   height: 40px; /* Pre-define height to accommodate button */
 }
 
+.header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.audio-player-desktop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 20px;
+    border-left: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.audio-btn {
+    background: transparent;
+    border: none;
+    color: var(--neon-blue);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+.audio-btn:hover { opacity: 1; text-shadow: 0 0 5px var(--neon-blue); }
+.audio-btn svg { width: 100%; height: 100%; }
+
+.audio-info {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.music-label { color: var(--neon-purple); font-weight: bold; font-size: 0.6rem; }
+.track-name { font-family: var(--font-code); }
+
 .header-controls {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
 .time-display {
   display: flex;
   align-items: center;
@@ -186,17 +251,17 @@ onUnmounted(() => {
   100% { opacity: 1; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px), (max-height: 600px) {
   .hud-container {
-    width: calc(100vw - 20px); /* Margin from edges */
-    height: calc(100dvh - 20px); /* Margin from edges */
-    height: calc(100vh - 20px); /* Fallback */
-    max-height: 95vh; /* Safety cap */
-    padding: 10px; /* Reduced internal padding */
-    border: 1px solid rgba(0, 243, 255, 0.3); /* Restore border */
-    border-radius: 5px; /* Slight rounding if desired, or 0 */
-    transform: none !important; /* Disable 3D tilt */
-    margin: auto; /* Ensure centering in flex parent */
+    width: calc(100vw - 20px); 
+    height: calc(100dvh - 20px); 
+    height: calc(100vh - 20px); 
+    max-height: none; /* remove 95vh cap for small landscape if needed, or keep safety. 95vh is fine. */
+    padding: 10px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 5px;
+    transform: none !important; 
+    margin: auto; 
   }
   
   .hud-header {
@@ -211,7 +276,8 @@ onUnmounted(() => {
     margin-bottom: 10px;
   }
 
-  .system-status {
+  /* Hide Left Group (System Status + Desktop Audio) */
+  .header-left-group, .audio-player-desktop {
     display: none;
   }
   

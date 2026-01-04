@@ -379,8 +379,8 @@ const openContact = () => {
   display: grid;
   grid-template-columns: repeat(2, min-content); /* 2 Columns for 2x2 layout */
   column-gap: 60px; /* Balanced gap */
-  row-gap: 15px;
-  margin-top: 15px;
+  row-gap: 8px; /* Reduced from 15px to tighten grid */
+  margin-top: 5px; /* Reduced from 15px to 5px (Total ~10px from title) */
   padding-left: 5px; 
   width: 100%;
 }
@@ -675,13 +675,13 @@ const openContact = () => {
   opacity: 0.3;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px), (max-height: 600px) {
   .about-view {
-    overflow-y: auto; /* Allow scrolling on mobile */
-    height: 100%; /* Fit within parent viewport */
-    min-height: 0; /* Reset min-height */
+    overflow-y: auto; /* Allow scrolling */
+    height: 100%; 
+    min-height: 0;
     padding: 10px;
-    padding-bottom: 20px; /* Safe padding for bottom content w/o footer */
+    padding-bottom: 20px; 
   }
 
   .grid-layout {
@@ -745,9 +745,13 @@ const openContact = () => {
     margin-bottom: 0;
   }
   
-  .identity-data.primary .value { font-size: 1.2rem; white-space: normal; line-height: 1.1; }
-  .identity-data.secondary .value { font-size: 1rem; }
-  .identity-data.tertiary .value { font-size: 0.9rem; }
+  .identity-data.primary .value { 
+    font-size: clamp(1.2rem, 4vw, 2rem); /* Dynamic scaling */
+    white-space: normal; 
+    line-height: 1.1; 
+  }
+  .identity-data.secondary .value { font-size: clamp(1rem, 3vw, 1.4rem); }
+  .identity-data.tertiary .value { font-size: clamp(0.9rem, 2.5vw, 1.2rem); }
   
   .details-grid {
     grid-template-columns: 1fr; /* 1 col for vertical list */
