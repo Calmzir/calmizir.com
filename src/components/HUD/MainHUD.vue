@@ -85,10 +85,9 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: 30px 60px; /* Increased side padding */
-  border-radius: 4px; 
   border: 1px solid rgba(0, 243, 255, 0.3);
-  background: rgba(5, 10, 16, 0.6); /* Transparent dark */
-  backdrop-filter: blur(10px); /* Blur effect */
+  background: rgba(5, 10, 16, 0.4); /* More transparent */
+  backdrop-filter: blur(3px); /* Reduced blur */
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); /* Deep shadow for 3D separation */
 }
 

@@ -1,111 +1,142 @@
 <script setup>
-import HoloCard from '../components/UI/HoloCard.vue'
+import { ref, onMounted } from 'vue';
+import { projectService } from '../services/projectService';
+import { useWindowManager } from '../composables/useWindowManager';
+import ProjectDetailView from './ProjectDetailView.vue';
+import HoloCard from '../components/UI/HoloCard.vue';
+import { useSystemLogs } from '../composables/useSystemLogs'; // Import
 
-const projects = [
-  { 
-    id: 1, 
-    title: 'NEON COMMERCE', 
-    desc: 'Next Gen E-commerce platform built with Nuxt.',
-    tech: ['Nuxt', 'Stripe', 'Tailwind'] 
-  },
-  { 
-    id: 2, 
-    title: 'CYBER DASH', 
-    desc: 'Real-time data visualization dashboard.',
-    tech: ['Vue', 'D3.js', 'Socket.io'] 
-  },
-  { 
-    id: 3, 
-    title: 'ASTRO CLOUD', 
-    desc: 'File management system for distributed teams.',
-    tech: ['React', 'Firebase', 'AWS'] 
-  }
-]
+const projects = ref([]);
+const { openWindow } = useWindowManager();
+const { addLog } = useSystemLogs(); // Init
+
+onMounted(async () => {
+  projects.value = await projectService.getAll();
+});
+
+const openProject = (project) => {
+  addLog(`ACCESSING_FILE: ${project.title}`, 'ACTION');
+  openWindow(ProjectDetailView, { projectId: project.id }, `PROJECT: ${project.title.toUpperCase()}`);
+};
 </script>
 
 <template>
-  <div class="view-container portfolio-view">
-    <h2 class="view-title">PROJECT ARCHIVES</h2>
-    
+  <div class="portfolio-list">
+    <div class="header-section">
+      <h2>PROJECT ARCHIVE</h2>
+      <div class="line"></div>
+    </div>
+
     <div class="projects-grid">
-      <HoloCard 
+      <div 
         v-for="project in projects" 
         :key="project.id" 
-        :title="project.title"
-        class="project-card"
+        class="project-item"
+        @click="openProject(project)"
       >
-        <p class="project-desc">{{ project.desc }}</p>
-        <div class="tech-stack">
-          <span v-for="t in project.tech" :key="t" class="tech-badge">
-            {{ t }}
-          </span>
+        <div class="thumb-container">
+          <img :src="project.thumbnail" />
+          <div class="overlay">OPEN</div>
         </div>
-        <button class="access-btn">ACCESS DATA</button>
-      </HoloCard>
+        <div class="info">
+          <h3>{{ project.title }}</h3>
+          <button class="open-btn">ACCESS</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.portfolio-view {
+.portfolio-list {
+  padding: 20px;
   height: 100%;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-.view-title {
-  font-family: var(--font-main);
+.header-section h2 {
   color: var(--neon-blue);
-  margin-bottom: 40px;
-  font-size: 2rem;
-  text-shadow: 0 0 10px var(--neon-blue);
+  font-family: var(--font-header);
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+
+.line {
+  height: 1px;
+  background: var(--neon-blue);
+  width: 50px;
+  margin-bottom: 20px;
 }
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  width: 100%;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
 }
 
-.project-desc {
-  margin-bottom: 20px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-}
-
-.tech-stack {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.tech-badge {
-  font-size: 0.7rem;
-  border: 1px solid rgba(188, 19, 254, 0.5);
-  padding: 2px 6px;
-  color: var(--neon-purple);
-}
-
-.access-btn {
-  background: rgba(0, 243, 255, 0.1);
-  border: 1px solid var(--neon-blue);
-  color: var(--neon-blue);
-  padding: 8px 16px;
-  width: 100%;
-  font-family: var(--font-main);
-  cursor: pointer;
+.project-item {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  padding: 10px;
   transition: all 0.3s;
-  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
 }
 
-.access-btn:hover {
-  background: var(--neon-blue);
+.project-item:hover {
+  border-color: var(--neon-blue);
+  background: rgba(0, 243, 255, 0.05);
+}
+
+.thumb-container {
+  height: 100px;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+  border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+}
+
+.thumb-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.project-item:hover img {
+  transform: scale(1.1);
+}
+
+.info h3 {
+  font-size: 0.9rem;
+  color: #fff;
+  margin-bottom: 10px;
+  font-family: var(--font-header);
+}
+
+.open-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--neon-purple);
+  color: var(--neon-purple);
+  font-size: 0.7rem;
+  padding: 4px;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: all 0.2s;
+  /* Top-Left and Bottom-Right Cuts */
+  clip-path: polygon(
+    5px 0, 
+    100% 0, 
+    100% calc(100% - 5px), 
+    calc(100% - 5px) 100%, 
+    0 100%, 
+    0 5px
+  );
+}
+
+.project-item:hover .open-btn {
+  background: var(--neon-purple);
   color: #000;
-  box-shadow: 0 0 15px var(--neon-blue);
 }
 </style>

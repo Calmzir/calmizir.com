@@ -1,20 +1,21 @@
 <script setup>
-import { ref } from 'vue';
-import DraggableWindow from '../components/UI/DraggableWindow.vue';
+import { useWindowManager } from '../composables/useWindowManager';
+import { useSystemLogs } from '../composables/useSystemLogs';
 import PortfolioView from './PortfolioView.vue';
 import ContactView from './ContactView.vue';
+import WindowLayer from '../components/UI/WindowLayer.vue';
 
-// Window States
-const showPortfolio = ref(false);
-const showContact = ref(false);
+const { openWindow } = useWindowManager();
+const { addLog } = useSystemLogs(); 
 
-const togglePortfolio = () => {
-  showPortfolio.value = !showPortfolio.value;
-  // Optional: bring to top logic (handled by hover for now, but click-to-focus could be added)
+const openPortfolio = () => {
+  addLog('OPEN_WINDOW: PORTFOLIO_MODULE', 'ACTION');
+  openWindow(PortfolioView, {}, 'PROJECT ARCHIVES');
 };
 
-const toggleContact = () => {
-  showContact.value = !showContact.value;
+const openContact = () => {
+  addLog('OPEN_WINDOW: COMM_UPLINK', 'ACTION');
+  openWindow(ContactView, {}, 'ESTABLISH UPLINK');
 };
 </script>
 
@@ -22,45 +23,13 @@ const toggleContact = () => {
   <div class="view-container about-view">
     <div class="grid-layout debug-grid">
       
-      <!-- ... (Content remains same until footer) ... -->
-      
       <!-- Window Layer (Overlaid on top of grid) -->
-      <transition name="fade">
-        <Teleport to="#window-layer">
-          <!-- Portfolio Window -->
-          <DraggableWindow 
-            v-if="showPortfolio" 
-            title="PROJECT ARCHIVES" 
-            width="800px" 
-            height="500px"
-            :initialX="100"
-            :initialY="50"
-            @close="showPortfolio = false"
-            style="pointer-events: auto;"
-          >
-            <PortfolioView />
-          </DraggableWindow>
-
-          <!-- Contact Window -->
-          <DraggableWindow 
-            v-if="showContact" 
-            title="ESTABLISH UPLINK" 
-            width="500px" 
-            height="600px"
-            :initialX="150"
-            :initialY="80"
-            @close="showContact = false"
-            style="pointer-events: auto;"
-          >
-            <ContactView />
-          </DraggableWindow>
-        </Teleport>
-      </transition>
+      <Teleport to="#window-layer">
+        <WindowLayer />
+      </Teleport>
 
       <div class="bio-image-container">
-        <div class="image-placeholder">
-          <span>[PILOT_IMG]</span>
-        </div>
+        <img src="/images/pilot-profile.jpg" alt="Pilot Profile" class="pilot-image" />
       </div>
 
       <!-- Header Container -->
@@ -180,25 +149,25 @@ const toggleContact = () => {
       <footer class="footer-container">
         <nav class="footer-nav">
           <button class="nav-btn footer-btn active">BIOGRAPHY</button>
-          <button class="nav-btn footer-btn" @click="togglePortfolio" :class="{ active: showPortfolio }">PORTFOLIO</button>
-          <button class="nav-btn footer-btn" @click="toggleContact" :class="{ active: showContact }">CONTACT</button>
+          <button class="nav-btn footer-btn" @click="openPortfolio">PORTFOLIO</button>
+          <button class="nav-btn footer-btn" @click="openContact">CONTACT</button>
         </nav>
       </footer>
 
       <!-- Side Navigation -> SOCIALS -->
       <nav class="sidebar-nav">
         <!-- LinkedIn -->
-        <a href="#" class="nav-btn square-btn social-btn" title="LINKEDIN">
+        <a href="https://www.linkedin.com/in/joel-fereira-179298161/" target="_blank" class="nav-btn square-btn social-btn" title="LINKEDIN">
           <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
         </a>
         
         <!-- WhatsApp -->
         <a href="https://wa.me/5699419549?text=Hello!%20I'd%20love%20to%20get%20in%20touch%20with%20you." target="_blank" class="nav-btn square-btn social-btn" title="WHATSAPP">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23c-1.48 0-2.93-.39-4.19-1.15l-.3-.17l-3.12.82l.83-3.04l-.2-.32a8.188 8.188 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24M8.53 7.33c-.16-.03-.43-.05-.63-.05c-.2 0-.52.07-.79.37c-.27.29-1.04 1.01-1.04 2.47s1.07 2.86 1.22 3.06c.15.19 2.1 3.21 5.09 4.5c.73.31 1.25.5 1.66.63c.67.22 1.28.19 1.77.12c.54-.08 1.66-.68 1.9-1.34c.24-.66.24-1.22.17-1.34c-.07-.12-.25-.19-.52-.32c-.27-.14-1.61-.79-1.86-.88c-.25-.09-.43-.14-.61.13c-.18.28-.7 .88-.86 1.05c-.16.18-.32.19-.59.06c-.27-.13-1.15-.42-2.19-1.34c-.81-.72-1.36-1.61-1.52-1.88c-.16-.27-.02-.42.11-.55c.12-.12.27-.31.4-.47c.13-.15.18-.26.27-.43c.09-.17.05-.32-.02-.45c-.08-.13-.73-1.77-1.01-2.42c-.25-.57-.5-.5-.69-.51"/></svg>
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
         </a>
 
         <!-- GitHub -->
-        <a href="#" class="nav-btn square-btn social-btn" title="GITHUB">
+        <a href="https://github.com/Calmzir" target="_blank" class="nav-btn square-btn social-btn" title="GITHUB">
           <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 7.18 9.61c.5.09.68-.22.68-.48c0-.24-.01-.88-.01-1.73c-2.78.6-3.37-1.34-3.37-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85c0 1.34-.01 2.42-.01 2.74c0 .26.18.57.69.48A10 10 0 0 0 22 12A10 10 0 0 0 12 2z"/></svg>
         </a>
         
@@ -272,26 +241,32 @@ const toggleContact = () => {
   grid-column: 1 / span 3; /* First 3 columns */
   grid-row: 1 / -1; /* Full height */
   border: 1px solid var(--neon-blue);
-  background: rgba(0, 243, 255, 0.05);
+  background: rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; /* Center horizontally and vertically */
   z-index: 2; /* Content layer */
 }
 
-.image-placeholder {
-  color: var(--neon-blue);
-  font-family: monospace;
-  letter-spacing: 2px;
-  animation: pulse-op 2s infinite;
+.pilot-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Cover container while maintaining aspect ratio */
+  object-position: center top; /* Focus on face/upper body if cropped */
+  opacity: 0.9;
+  mix-blend-mode: luminosity; /* Cyberpunk effect */
+  transition: all 0.5s ease;
 }
 
-@keyframes pulse-op {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+.pilot-image:hover {
+  mix-blend-mode: normal; /* Reveal colors on hover */
+  opacity: 1;
+  transform: scale(1.02);
 }
+
+/* Remove placeholder styles */
 
 .sidebar-nav {
   grid-column: 12 / 13; /* Column 12 */
@@ -438,7 +413,8 @@ const toggleContact = () => {
   align-items: flex-start;
   z-index: 2;
   box-shadow: inset 0 0 20px rgba(188, 19, 254, 0.1);
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
+  overflow: hidden; /* Prevent container expand */
 }
 
 .section-internal-header {
@@ -469,14 +445,31 @@ const toggleContact = () => {
   text-align: left; /* Reset from center */
   color: #fff;
   font-family: monospace;
-  line-height: 1.6;
+  line-height: 1.5; /* Reduced line height */
   opacity: 0.9;
+  flex-grow: 1;
+  overflow-y: auto; /* Enable scrolling if text is too long */
+  padding-right: 5px; /* Space for scrollbar */
+  
+  /* Scrollbar Styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-purple) transparent;
+}
+
+.text-content::-webkit-scrollbar {
+  width: 4px;
+}
+.text-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.text-content::-webkit-scrollbar-thumb {
+  background-color: var(--neon-purple);
 }
 
 .bio-paragraph {
-  font-size: 0.95rem;
+  font-size: 0.85rem; /* Reduced font size */
   letter-spacing: 0.5px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .bio-stats {
@@ -627,6 +620,15 @@ const toggleContact = () => {
   text-align: center;
   position: relative;
   overflow: hidden;
+  /* Top-Left and Bottom-Right Cuts */
+  clip-path: polygon(
+    15px 0, 
+    100% 0, 
+    100% calc(100% - 15px), 
+    calc(100% - 15px) 100%, 
+    0 100%, 
+    0 15px
+  );
 }
 
 .footer-btn:hover, .footer-btn.active {

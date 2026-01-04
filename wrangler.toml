@@ -1,0 +1,6 @@
+name = "calmizir-portfolio"
+pages_build_output_dir = "dist"
+[[d1_databases]]
+binding = "DB" # This matches env.DB in your functions
+database_name = "portfolio-db"
+database_id = "0cef5026-30f7-4284-99ca-d5b0a6fc78c3"

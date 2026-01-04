@@ -58,6 +58,7 @@ const style = computed(() => ({
   backdrop-filter: blur(10px);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* clip-path removed per user request */
 }
 
 .draggable-window:hover {

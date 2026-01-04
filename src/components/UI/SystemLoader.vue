@@ -1,8 +1,12 @@
+```vue
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useMouseParallax } from '../../composables/useMouseParallax'
+import { useSystemLogs } from '../../composables/useSystemLogs'; // Import
 
-const emit = defineEmits(['complete'])
+const { addLog } = useSystemLogs();
+
+const emit = defineEmits(['ready'])
 
 const lines = ref([])
 const showCursor = ref(true)
@@ -24,12 +28,16 @@ const typeText = async (text, delay = 50) => {
 }
 
 const runSequence = async () => {
+  addLog('LOADER_SEQUENCE_START', 'SYS');
   await sleep(200) // +100ms
   await typeText(':: SYSTEM BOOT SEQUENCE INITIATED ::', 10) // +5ms delay
+  addLog('SYSTEM_BOOT_INITIATED', 'SYS');
   await sleep(100) // +50ms
   await typeText('> CHECKING CORE MODULES... OK', 5) // +3ms delay
+  addLog('CORE_MODULES_CHECK_OK', 'SYS');
   await sleep(100) // +50ms
   await typeText('> LOADING GRAPHICAL INTERFACE... OK', 5) // +3ms delay
+  addLog('GRAPHICAL_INTERFACE_LOADED', 'SYS');
   await sleep(200) // +100ms
   
   // Login Simulation
@@ -67,7 +75,7 @@ const runSequence = async () => {
   await sleep(1000) // +600ms (more steady read time)
   isFading.value = true
   await sleep(600) 
-  emit('complete')
+  emit('ready')
 }
 
 onMounted(() => {

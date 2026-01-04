@@ -1,13 +1,16 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue' // Add computed here
 import MainHUD from './components/HUD/MainHUD.vue'
 import HomeView from './views/HomeView.vue'
 import AboutView from './views/AboutView.vue'
 import PortfolioView from './views/PortfolioView.vue'
 import ContactView from './views/ContactView.vue'
 import SystemLoader from './components/UI/SystemLoader.vue'
+import BackgroundConsole from './components/UI/BackgroundConsole.vue' // Re-import
+import { useSystemLogs } from './composables/useSystemLogs' // Re-import
 import { useMouseParallax } from './composables/useMouseParallax'
 
+const { addLog } = useSystemLogs()
 const currentView = ref('About')
 const isLoading = ref(true)
 
@@ -27,13 +30,23 @@ const renderView = computed(() => {
 })
 
 const onLoaderComplete = () => {
+  addLog('SYSTEM_LOADER_COMPLETE', 'SYS')
+  addLog('INIT_MAIN_INTERFACE', 'SYS')
   isLoading.value = false
 }
+
+onMounted(() => {
+  addLog('BOOT_SEQUENCE_INITIATED', 'SYS')
+  addLog('CHECKING_BioKernel...', 'SYS')
+})
 </script>
 
 <template>
   <main class="main-interface">
-    <SystemLoader v-if="isLoading" @complete="onLoaderComplete" />
+    <SystemLoader v-if="isLoading" @ready="onLoaderComplete" /> <!-- Changed @complete to @ready -->
+    
+    <!-- Background Console Layer -->
+    <BackgroundConsole />
     
     <div class="scanline"></div>
     <div 
@@ -44,16 +57,17 @@ const onLoaderComplete = () => {
     </div>
     
     <Transition name="window-pop">
-      <MainHUD 
-        v-if="!isLoading"
-        :current-view="currentView" 
-        @change-view="(view) => currentView = view"
-        :style="{ transform: `perspective(1000px) rotateY(${hudX * 0.05}deg) rotateX(${-hudY * 0.05}deg)` }"
-      >
-        <Transition name="fade" mode="out-in">
-          <component :is="renderView" />
-        </Transition>
-      </MainHUD>
+      <div class="hud-wrapper" v-if="!isLoading"> <!-- Wrapper for Z-Index -->
+        <MainHUD 
+          :current-view="currentView" 
+          @change-view="(view) => currentView = view"
+          :style="{ transform: `perspective(1000px) rotateY(${hudX * 0.05}deg) rotateX(${-hudY * 0.05}deg)` }"
+        >
+          <Transition name="fade" mode="out-in">
+            <component :is="renderView" />
+          </Transition>
+        </MainHUD>
+      </div>
     </Transition>
     
     <!-- Global Window Layer for Teleported Popups -->
@@ -74,6 +88,23 @@ const onLoaderComplete = () => {
   perspective: 1000px; /* Enable 3D space */
 }
 
+/* Ensure HUD is above console */
+.hud-wrapper {
+  z-index: 10;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* Let clicks pass to children, but wrapper shouldn't block */
+}
+
+/* Allow HUD to receive clicks */
+.hud-wrapper > * {
+  pointer-events: auto;
+}
+
 #window-layer {
   position: absolute;
   top: 0; left: 0;
@@ -87,11 +118,10 @@ const onLoaderComplete = () => {
   position: absolute;
   top: -5%; left: -5%; 
   width: 110%; height: 110%; /* Oversize to prevent gaps on move */
-  z-index: 0;
+  z-index: 1; /* Above Background Console */
   transition: transform 0.1s ease-out;
 }
-
-/* Window Pop Animation for MainHUD */
+/* ... rest of styles */
 .window-pop-enter-active {
   transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
