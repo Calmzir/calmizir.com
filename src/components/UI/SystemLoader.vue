@@ -140,6 +140,13 @@ onMounted(() => {
   font-family: monospace;
 }
 
+@media (max-width: 768px) {
+  .console-window {
+    width: 90vw;
+    height: 60vh;
+  }
+}
+
 .window-header {
   background: rgba(0, 243, 255, 0.1);
   border-bottom: 1px solid var(--neon-blue);

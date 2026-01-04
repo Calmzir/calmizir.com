@@ -15,12 +15,14 @@ export async function onRequestPost(context) {
     // For standard portfolio updates, you'd likely run this locally or protect via Cloudflare Access.
 
     try {
-        const { title, description, thumbnail, project_url, date, images } = await context.request.json();
+        const { title, description, description_es, thumbnail, project_url, date, images } = await context.request.json();
 
         // Insert Project
+        // Note: If RETURNING id is removed, meta.last_row_id might not be available.
+        // For D1, `run()` on an INSERT statement without RETURNING will still populate meta.last_row_id if the table has an auto-incrementing primary key.
         const { meta } = await context.env.DB.prepare(
-            "INSERT INTO projects (title, description, thumbnail, project_url, date) VALUES (?, ?, ?, ?, ?) RETURNING id"
-        ).bind(title, description, thumbnail, project_url, date).run();
+            "INSERT INTO projects (title, description, description_es, thumbnail, project_url, date) VALUES (?, ?, ?, ?, ?, ?)"
+        ).bind(title || 'Untitled', description || '', description_es || '', thumbnail || '', project_url || '#', date || new Date().toISOString()).run();
 
         const projectId = meta.last_row_id;
 

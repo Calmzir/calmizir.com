@@ -17,7 +17,7 @@ const { x, y, onDragStart, isDragging } = useDraggable(props.initialX, props.ini
 const style = computed(() => ({
   width: props.width,
   height: 'auto', // Dynamic height
-  maxHeight: '80vh', // Constrain to viewport
+  maxHeight: '90vh', // Constrain to viewport
   transform: `translate(${x.value}px, ${y.value}px)`,
   zIndex: isDragging.value ? 1000 : 100
 }));
@@ -147,5 +147,33 @@ const style = computed(() => ({
   border-bottom: 2px solid var(--neon-blue);
   cursor: nwse-resize;
   opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .draggable-window {
+    width: calc(100vw - 20px) !important; /* Match MainHUD margin */
+    height: calc(100dvh - 20px) !important; /* Match MainHUD margin */
+    height: calc(100vh - 20px) !important; /* Fallback */
+    top: 10px !important; /* Center vertically/horizontally */
+    left: 10px !important;
+    transform: none !important;
+    max-height: none !important; /* Remove constraints */
+    border: 1px solid var(--neon-blue) !important; /* Restore Full Border */
+    border-radius: 5px; /* Match HUD */
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); /* Strong shadow for popup feel */
+  }
+  
+  .window-header {
+    cursor: default;
+    pointer-events: none;
+  }
+  
+  .window-header .control-btn {
+    pointer-events: auto;
+  }
+  
+  .resize-handle {
+    display: none;
+  }
 }
 </style>

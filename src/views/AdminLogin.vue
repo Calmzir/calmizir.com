@@ -5,24 +5,36 @@ import { useSystemLogs } from '../composables/useSystemLogs';
 import { useWindowManager } from '../composables/useWindowManager';
 import AdminCMS from './AdminCMS.vue';
 
+
+const props = defineProps({
+  windowId: String
+});
+
 const username = ref('');
 const password = ref('');
 const error = ref('');
 const { addLog } = useSystemLogs();
-const { openWindow } = useWindowManager();
+const { openWindow, closeWindow } = useWindowManager();
 
 const handleLogin = async () => {
   try {
     error.value = '';
     await projectService.login(username.value, password.value);
     addLog('ADMIN ACCESS GRANTED', 'SUCCESS');
-    openWindow(AdminCMS, {}, 'SYSTEM CONTROL');
-    // Ideally close this window or replace content, but for now we open CMS
+    
+    // Open CMS on the right side (assuming standard 1920 width, somewhere clear)
+    openWindow(AdminCMS, { initialX: 800, initialY: 100 }, 'SYSTEM CONTROL');
+    
+    // Close Login Window
+    if (props.windowId) {
+        closeWindow(props.windowId);
+    }
   } catch (e) {
     error.value = 'Invalid Credentials';
     addLog('ADMIN ACCESS DENIED', 'ERROR');
   }
 };
+
 </script>
 
 <template>
@@ -115,5 +127,11 @@ input:focus {
   font-family: var(--font-code);
   margin-bottom: 15px;
   text-shadow: 0 0 5px red;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 20px;
+  }
 }
 </style>

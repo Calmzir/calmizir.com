@@ -12,6 +12,7 @@ CREATE TABLE projects (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   description TEXT,
+  description_es TEXT,
   thumbnail TEXT,
   project_url TEXT,
   date TEXT

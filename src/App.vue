@@ -7,10 +7,11 @@ import PortfolioView from './views/PortfolioView.vue'
 import ContactView from './views/ContactView.vue'
 import SystemLoader from './components/UI/SystemLoader.vue'
 import BackgroundConsole from './components/UI/BackgroundConsole.vue' // Re-import
+import SystemAlert from './components/UI/SystemAlert.vue' // Import Alert
 import { useSystemLogs } from './composables/useSystemLogs' // Re-import
 import { useMouseParallax } from './composables/useMouseParallax'
 
-const { addLog } = useSystemLogs()
+const { addLog, alertVisible, alertMessage, alertType, closeAlert } = useSystemLogs()
 const currentView = ref('About')
 const isLoading = ref(true)
 
@@ -47,6 +48,14 @@ onMounted(() => {
     
     <!-- Background Console Layer -->
     <BackgroundConsole />
+    
+    <!-- System Alert Overlay (High Z-Index) -->
+    <SystemAlert 
+      :visible="alertVisible"
+      :message="alertMessage"
+      :type="alertType"
+      @close="closeAlert"
+    />
     
     <div class="scanline"></div>
     <div 

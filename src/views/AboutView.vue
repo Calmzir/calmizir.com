@@ -1,21 +1,24 @@
 <script setup>
 import { useWindowManager } from '../composables/useWindowManager';
 import { useSystemLogs } from '../composables/useSystemLogs';
+import { useLanguage } from '../composables/useLanguage'; // Import
 import PortfolioView from './PortfolioView.vue';
 import ContactView from './ContactView.vue';
 import WindowLayer from '../components/UI/WindowLayer.vue';
+import LangSwitch from '../components/UI/LangSwitch.vue'; // Import Switch
 
 const { openWindow } = useWindowManager();
 const { addLog } = useSystemLogs(); 
+const { t } = useLanguage(); // Init
 
 const openPortfolio = () => {
   addLog('OPEN_WINDOW: PORTFOLIO_MODULE', 'ACTION');
-  openWindow(PortfolioView, {}, 'PROJECT ARCHIVES');
+  openWindow(PortfolioView, {}, t('PROJECTS'));
 };
 
 const openContact = () => {
   addLog('OPEN_WINDOW: COMM_UPLINK', 'ACTION');
-  openWindow(ContactView, {}, 'ESTABLISH UPLINK');
+  openWindow(ContactView, {}, t('ESTABLISH_UPLINK'));
 };
 </script>
 
@@ -45,28 +48,28 @@ const openContact = () => {
           <!-- Col 2-12: Data -->
           <div class="header-data-wrapper">
             <div class="identity-data primary">
-              <span class="label">FULLNAME:</span>
+              <span class="label">{{ t('FULLNAME') }}:</span>
               <span class="value">JOEL FEREIRA</span>
             </div>
             
             <div class="details-grid">
               <div class="identity-data secondary">
-                <span class="label">CODENAME:</span>
+                <span class="label">{{ t('CODENAME') }}:</span>
                 <span class="value">CALMIZIR</span>
               </div>
               <div class="identity-data tertiary">
-                <span class="label">OCCUPATION:</span>
-                <span class="value">FULLSTACK ARCHITECT</span>
+                <span class="label">{{ t('OCCUPATION') }}:</span>
+                <span class="value">{{ t('JOB_TITLE') }}</span>
               </div>
               
               <!-- RPG Fields -->
               <div class="identity-data rpg-field">
-                <span class="label">STATUS:</span>
-                <span class="value text-success">OPERATIONAL</span>
+                <span class="label">{{ t('STATUS') }}:</span>
+                <span class="value text-success">{{ t('OPERATIONAL') }}</span>
               </div>
               <div class="identity-data rpg-field">
-                <span class="label">RANK:</span>
-                <span class="value">SENIOR OFFICER</span>
+                <span class="label">{{ t('RANK') }}:</span>
+                <span class="value">{{ t('SENIOR_OFFICER') }}</span>
               </div>
             </div>
           </div>
@@ -79,27 +82,25 @@ const openContact = () => {
           <svg class="section-header-icon" viewBox="0 0 24 24">
             <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
           </svg>
-          <span class="section-title">BIOGRAPHY</span>
+          <span class="section-title">{{ t('BIOGRAPHY') }}</span>
         </div>
         
         <div class="bio-stats">
           <div class="stat-item">
-            <span class="label">INIT_DATE:</span> 1999.10.18
+            <span class="label">{{ t('INIT_DATE_LABEL') }}:</span> 1999.10.18
           </div>
           <div class="stat-item">
-            <span class="label">ORIGIN:</span> VENEZUELA
+            <span class="label">{{ t('ORIGIN_LABEL') }}:</span> {{ t('COUNTRY_NAME') }}
           </div>
         </div>
 
         <div class="text-content">
           <p class="bio-paragraph">
-            A VETERAN ARCHITECT OF DIGITAL SYSTEMS SPECIALIZED IN CONSTRUCTING HIGH-PERFORMANCE WEB INFRASTRUCTURES. 
-            I BRIDGE THE GAP BETWEEN CONCEPTUAL DESIGN AND FUNCTIONAL DEPLOYMENT, CRAFTING IMMERSIVE EXPERIENCES THAT RESONATE. 
-            MY MISSION IS TO UPGRADE YOUR VISION INTO A TANGIBLE REALITY, OPTIMIZING EVERY PIXEL AND LINE OF CODE FOR MAXIMUM IMPACT.
+            {{ t('BIO_PARAGRAPH') }}
           </p>
           
           <div class="bio-quote">
-            > "IF YOU CAN IMAGINE IT, IT CAN BE CREATED. YOU ONLY HAVE TO TAKE THE FIRST STEP."
+            > {{ t('BIO_QUOTE') }}
           </div>
         </div>
       </div>
@@ -110,22 +111,22 @@ const openContact = () => {
           <svg class="section-header-icon" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2m0 18a8 8 0 1 1 8-8a8 8 0 0 1-8 8m3.31-6.9a5.5 5.5 0 0 0-4.51-3.69v1.73A3.8 3.8 0 0 1 12.92 13h1.86a2 2 0 0 0 2.22-1.78M12 7a5 5 0 0 0-3.31 1.41l1.59 1.59A2.9 2.9 0 0 1 12 9a3 3 0 0 1 2.94 2.37l1.7-1A5 5 0 0 0 12 7Z"/>
           </svg>
-          <span class="section-title">SKILL_MATRIX</span>
+          <span class="section-title">{{ t('SKILL_MATRIX') }}</span>
         </div>
         
         <div class="skills-content">
           <!-- Languages Group -->
           <div class="skill-group">
-            <span class="group-label">LANGUAGES:</span>
+            <span class="group-label">{{ t('LANGUAGES') }}:</span>
             <ul class="skills-list">
-              <li class="skill-item">ESPAÑOL</li>
-              <li class="skill-item">ENGLISH</li>
+              <li class="skill-item">{{ t('ESPANOL') }}</li>
+              <li class="skill-item">{{ t('ENGLISH') }}</li>
             </ul>
           </div>
 
           <!-- Modules Group -->
           <div class="skill-group">
-            <span class="group-label">MODULES:</span>
+            <span class="group-label">{{ t('MODULES') }}:</span>
             <ul class="skills-list grid-list">
               <li class="skill-item">HTML</li>
               <li class="skill-item">CSS</li>
@@ -148,9 +149,9 @@ const openContact = () => {
       <!-- Footer Container -> MAIN NAVIGATION -->
       <footer class="footer-container">
         <nav class="footer-nav">
-          <button class="nav-btn footer-btn active">BIOGRAPHY</button>
-          <button class="nav-btn footer-btn" @click="openPortfolio">PORTFOLIO</button>
-          <button class="nav-btn footer-btn" @click="openContact">CONTACT</button>
+          <button class="nav-btn footer-btn active">{{ t('BTN_BIOGRAPHY') }}</button>
+          <button class="nav-btn footer-btn" @click="openPortfolio">{{ t('BTN_PORTFOLIO') }}</button>
+          <button class="nav-btn footer-btn" @click="openContact">{{ t('BTN_CONTACT') }}</button>
         </nav>
       </footer>
 
@@ -172,11 +173,9 @@ const openContact = () => {
         </a>
         
         <div class="nav-spacer"></div>
-        
-        <!-- External/Settings -->
-        <button class="nav-btn square-btn social-btn" title="SETTINGS">
-           <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/></svg>
-        </button>
+
+        <!-- Language Switcher -->
+        <LangSwitch />
       </nav>
 
       <!-- Visual Column Markers (Hidden) -->
@@ -320,7 +319,7 @@ const openContact = () => {
   flex-direction: column; /* Stack vertically */
   justify-content: center;
   gap: 5px;
-  padding: 0 40px; /* Internal padding for data */
+  padding: 0 25px; /* Internal padding for data */
   width: 100%;
   align-items: flex-start;
 }
@@ -349,10 +348,10 @@ const openContact = () => {
 
 /* Primary: Fullname (Big & Bold) */
 .identity-data.primary .value {
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: 800;
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-  letter-spacing: 4px;
+  letter-spacing: 2px;
 }
 .identity-data.primary .label {
   display: none; 
@@ -674,6 +673,100 @@ const openContact = () => {
   width: 1px;
   background: linear-gradient(to bottom, transparent, var(--neon-blue), transparent);
   opacity: 0.3;
+}
+
+@media (max-width: 768px) {
+  .about-view {
+    overflow-y: auto; /* Allow scrolling on mobile */
+    height: 100%; /* Fit within parent viewport */
+    min-height: 0; /* Reset min-height */
+    padding: 10px;
+    padding-bottom: 20px; /* Safe padding for bottom content w/o footer */
+  }
+
+  .grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: auto; /* Let content grow */
+    padding-bottom: 20px;
+  }
+
+  /* Reset Grid Placements */
+  .bio-image-container,
+  .header-container,
+  .bio-text-container,
+  .skills-container,
+  .footer-container,
+  .sidebar-nav {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+  }
+
+  /* HIDE OLD NAVIGATION ON MOBILE */
+  .footer-container, 
+  .sidebar-nav, 
+  .nav-spacer { 
+    display: none !important; 
+  }
+
+  /* 1. Header */
+  .header-container { order: 1; margin-bottom: 0; }
+  .bio-image-container { order: 2; height: 200px; }
+  .bio-text-container { order: 3; }
+  .skills-container { order: 4; }
+  
+  /* Header Adjustments */
+  .header-container {
+    padding: 10px;
+    order: 2; 
+  }
+  
+  .header-content {
+    grid-template-columns: 40px 1fr; /* Reduce icon space */
+  }
+  
+  .header-data-wrapper {
+    padding-left: 10px;
+    align-items: stretch; /* alignment fix */
+  }
+  
+  .identity-data {
+    flex-direction: column; /* Stack Label and Value on mobile */
+    align-items: flex-start;
+    gap: 0;
+    margin-bottom: 5px;
+  }
+  
+  .identity-data .label {
+    display: block;
+    font-size: 0.6rem;
+    margin-bottom: 0;
+  }
+  
+  .identity-data.primary .value { font-size: 1.2rem; white-space: normal; line-height: 1.1; }
+  .identity-data.secondary .value { font-size: 1rem; }
+  .identity-data.tertiary .value { font-size: 0.9rem; }
+  
+  .details-grid {
+    grid-template-columns: 1fr; /* 1 col for vertical list */
+    margin-top: 5px;
+    row-gap: 8px; /* Reduced gap */
+  }
+  
+  /* Image Adjustments */
+  .bio-image-container {
+    border-right: 1px solid var(--neon-blue); /* Add border back */
+  }
+  
+  /* Skills Grid */
+  .skills-list.simple-list {
+    flex-direction: row; /* Keep languages horizontal */
+  }
+
+  /* Hide scrollbars for cleaner look */
+  .about-view::-webkit-scrollbar { width: 0; }
 }
 </style>
 

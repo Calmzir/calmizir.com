@@ -35,18 +35,30 @@ export async function onRequestPut(context) {
     const cookieHeader = context.request.headers.get("Cookie");
     const token = cookieHeader?.match(/auth_token=([^;]+)/)?.[1];
     if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 });
-    // In a real app we would verify the token signature here too (import jwt from utils), 
-    // but D1/KV lookup or middleware is better. For this MVP we trust the session is valid 
-    // if the functions/auth flow was followed, or we should validte it.
-    // Let's do a quick validation if possible or assume headers are checked by middleware if we had one.
-    // Ideally: import { jwt } from '../../utils/auth'; await jwt.verify(...)
 
     try {
-        const { title, description, thumbnail, project_url, date } = await context.request.json();
+        const { title, description, description_es, thumbnail, project_url, date, images } = await context.request.json();
 
-        await context.env.DB.prepare(
-            "UPDATE projects SET title = ?, description = ?, thumbnail = ?, project_url = ?, date = ? WHERE id = ?"
-        ).bind(title, description, thumbnail, project_url, date, id).run();
+        const statements = [
+            // 1. Update Project Details
+            context.env.DB.prepare(
+                "UPDATE projects SET title = ?, description = ?, description_es = ?, thumbnail = ?, project_url = ?, date = ? WHERE id = ?"
+            ).bind(title || 'Untitled', description || '', description_es || '', thumbnail || '', project_url || '#', date || new Date().toISOString(), id),
+
+            // 2. Delete Old Images
+            context.env.DB.prepare("DELETE FROM images WHERE project_id = ?").bind(id)
+        ];
+
+        // 3. Insert New Images
+        if (images && Array.isArray(images)) {
+            for (const imgUrl of images) {
+                statements.push(
+                    context.env.DB.prepare("INSERT INTO images (project_id, url) VALUES (?, ?)").bind(id, imgUrl)
+                );
+            }
+        }
+
+        await context.env.DB.batch(statements);
 
         return Response.json({ success: true });
     } catch (e) {

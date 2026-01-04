@@ -5,12 +5,17 @@ const props = defineProps({
 
 const emit = defineEmits(['select'])
 
-const menuItems = [
-  { id: 'Home', label: 'DASHBOARD' },
-  { id: 'About', label: 'BIO_DATA' },
-  { id: 'Portfolio', label: 'PROJECTS' },
-  { id: 'Contact', label: 'COMM_LINK' }
-]
+import { computed } from 'vue';
+import { useLanguage } from '../../composables/useLanguage';
+
+const { t } = useLanguage();
+
+const menuItems = computed(() => [
+  { id: 'Home', label: t('DASHBOARD') },
+  { id: 'About', label: t('BIO_DATA') },
+  { id: 'Portfolio', label: t('PROJECTS') },
+  { id: 'Contact', label: t('COMM_LINK') }
+]);
 </script>
 
 <template>
