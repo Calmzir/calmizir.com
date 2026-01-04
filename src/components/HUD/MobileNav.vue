@@ -69,8 +69,12 @@ const handleContact = () => {
           <div class="mobile-audio-player">
              <div class="player-info">
                <span class="p-label">AUDIO FEED:</span>
-               <span class="p-track">{{ metadata.artist }}</span>
-               <span class="p-song">{{ metadata.song }}</span>
+               <div class="audio-visualizer">
+                  <div class="bar"></div>
+                  <div class="bar"></div>
+                  <div class="bar"></div>
+                  <div class="bar"></div>
+               </div>
              </div>
              <button class="player-btn" @click="toggleMute" :class="{ muted: isMuted }">
                 <svg v-if="!isMuted" viewBox="0 0 24 24"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
@@ -161,7 +165,7 @@ const handleContact = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(5, 10, 16, 0.98); /* Slightly more opaque */
+  background: rgba(10, 14, 20, 0.98); /* Deep Space */
   backdrop-filter: blur(10px);
   z-index: 2050;
   display: flex;
@@ -193,7 +197,7 @@ const handleContact = () => {
 .menu-item {
   width: 100%;
   padding: 15px;
-  background: rgba(0, 243, 255, 0.05);
+  background: rgba(0, 240, 255, 0.05);
   border: 1px solid var(--neon-blue);
   color: #fff;
   font-family: var(--font-main);
@@ -220,6 +224,9 @@ const handleContact = () => {
 }
 
 .social-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 45px;
   height: 45px;
   padding: 10px;
@@ -227,6 +234,12 @@ const handleContact = () => {
   border-radius: 5px;
   color: var(--neon-purple);
   transition: all 0.3s ease;
+}
+
+.social-btn svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
 }
 
 .social-btn:hover {
@@ -256,7 +269,7 @@ const handleContact = () => {
   justify-content: space-between;
   width: 100%;
   padding: 10px 15px;
-  background: rgba(0, 243, 255, 0.05);
+  background: rgba(0, 240, 255, 0.05);
   border: 1px solid var(--neon-blue);
   border-radius: 4px;
 }

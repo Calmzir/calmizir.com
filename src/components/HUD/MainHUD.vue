@@ -69,8 +69,12 @@ onUnmounted(() => {
              <svg v-else viewBox="0 0 24 24"><path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" /></svg>
            </button>
            <div class="audio-info">
-             <span class="music-label">NOW PLAYING:</span>
-             <span class="track-name">{{ metadata.artist }} - {{ metadata.song }}</span>
+             <div class="audio-visualizer">
+               <div class="bar"></div>
+               <div class="bar"></div>
+               <div class="bar"></div>
+               <div class="bar"></div>
+             </div>
            </div>
         </div>
       </div>
@@ -122,8 +126,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: 30px 60px; /* Increased side padding */
-  border: 1px solid rgba(0, 243, 255, 0.3);
-  background: rgba(5, 10, 16, 0.4); /* More transparent */
+  border: 1px solid var(--glass-border);
+  background: rgba(10, 14, 20, 0.6); /* More transparent */
   backdrop-filter: blur(3px); /* Reduced blur */
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); /* Deep shadow for 3D separation */
 }
@@ -132,7 +136,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center; /* Center vertically */
-  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+  border-bottom: 1px solid var(--glass-border);
   padding-bottom: 10px;
   margin-bottom: 20px;
   font-family: var(--font-main);
@@ -153,7 +157,7 @@ onUnmounted(() => {
     align-items: center;
     gap: 10px;
     padding-left: 20px;
-    border-left: 1px solid rgba(0, 243, 255, 0.2);
+    border-left: 1px solid var(--glass-border);
 }
 
 .audio-btn {

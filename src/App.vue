@@ -65,7 +65,7 @@ onMounted(() => {
       <div class="bg-grid"></div>
     </div>
     
-    <Transition name="window-pop">
+    <Transition name="glitch-reveal">
       <div class="hud-wrapper" v-if="!isLoading"> <!-- Wrapper for Z-Index -->
         <MainHUD 
           :current-view="currentView" 

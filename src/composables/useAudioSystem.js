@@ -1,13 +1,13 @@
 import { ref, onMounted } from 'vue';
 
 const isPlaying = ref(false);
-const isMuted = ref(true); // Default to muted to allow autoplay
+const isMuted = ref(false); // Default to unmuted
 const volume = ref(0.2); // Low background volume
 let audio = null;
 
 const metadata = {
-    artist: 'Luke Melville',
-    song: 'Astronic'
+    artist: 'Cyberpunk',
+    song: 'Odyssey'
 };
 
 export function useAudioSystem() {
@@ -15,9 +15,16 @@ export function useAudioSystem() {
     const initAudio = () => {
         if (audio) return; // Already initialized
 
-        audio = new Audio('/sounds/Luke Melville - Astronic.mp3');
+        audio = new Audio('/sounds/Cyberpunk Odyssey.mp3');
         audio.loop = true;
         audio.volume = volume.value;
+
+        // Load saved mute preference
+        const savedMuted = localStorage.getItem('background_audio_muted');
+        if (savedMuted !== null) {
+            isMuted.value = savedMuted === 'true';
+        }
+
         audio.muted = isMuted.value;
 
         // Attempt autoplay
@@ -26,9 +33,7 @@ export function useAudioSystem() {
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 isPlaying.value = true;
-                // Autoplay started!
             }).catch(error => {
-                // Autoplay was prevented.
                 isPlaying.value = false;
                 console.log("Autoplay prevented. User interaction required.");
             });
@@ -37,18 +42,15 @@ export function useAudioSystem() {
 
     const toggleMute = () => {
         if (!audio) {
-            initAudio(); // Try init if not ready
-            // If it was not ready, it might be due to no interaction. 
-            // Calling init here on click should work.
+            initAudio();
         }
-
-        // If we are "muted" (effective state), we want to unmute and play.
-        // Or if we are just paused/blocked.
 
         if (isMuted.value) {
             // Unmuting
             isMuted.value = false;
             audio.muted = false;
+            localStorage.setItem('background_audio_muted', 'false'); // Save
+
             if (audio.paused) {
                 audio.play().then(() => isPlaying.value = true);
             }
@@ -56,6 +58,7 @@ export function useAudioSystem() {
             // Muting
             isMuted.value = true;
             audio.muted = true;
+            localStorage.setItem('background_audio_muted', 'true'); // Save
         }
     };
 
