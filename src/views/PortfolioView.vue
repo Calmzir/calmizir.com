@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { projectService } from '../services/projectService';
 import { useWindowManager } from '../composables/useWindowManager';
 import ProjectDetailView from './ProjectDetailView.vue';
+import AdminLogin from './AdminLogin.vue';
 import HoloCard from '../components/UI/HoloCard.vue';
 import { useSystemLogs } from '../composables/useSystemLogs'; // Import
 
@@ -10,20 +11,46 @@ const projects = ref([]);
 const { openWindow } = useWindowManager();
 const { addLog } = useSystemLogs(); // Init
 
+// Real-time updates
+const channel = new BroadcastChannel('cms_updates');
+
+const loadProjects = async () => {
+    projects.value = await projectService.getAll();
+};
+
 onMounted(async () => {
-  projects.value = await projectService.getAll();
+  await loadProjects();
+  
+  channel.onmessage = (event) => {
+    if (event.data.type === 'UPDATE') {
+        addLog('DATABASE UPDATE DETECTED', 'INFO');
+        loadProjects();
+    }
+  };
+});
+
+onUnmounted(() => {
+    channel.close();
 });
 
 const openProject = (project) => {
   addLog(`ACCESSING_FILE: ${project.title}`, 'ACTION');
   openWindow(ProjectDetailView, { projectId: project.id }, `PROJECT: ${project.title.toUpperCase()}`);
 };
+
+const openAdmin = () => {
+    openWindow(AdminLogin, {}, 'SYSTEM ACCESS');
+};
+
 </script>
 
 <template>
   <div class="portfolio-list">
     <div class="header-section">
-      <h2>PROJECT ARCHIVE</h2>
+      <div class="header-row">
+        <h2>PROJECT ARCHIVE</h2>
+        <button @click="openAdmin" class="admin-btn">π</button>
+      </div>
       <div class="line"></div>
     </div>
 
@@ -53,11 +80,31 @@ const openProject = (project) => {
   height: 100%;
 }
 
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .header-section h2 {
   color: var(--neon-blue);
   font-family: var(--font-header);
   letter-spacing: 2px;
   margin-bottom: 5px;
+}
+
+.admin-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.1);
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.admin-btn:hover {
+  color: var(--neon-blue);
 }
 
 .line {
